@@ -12,8 +12,6 @@ A modern, responsive e-commerce platform built with the MERN stack (MongoDB, Exp
 
 **[https://luxeecommercesite-production.up.railway.app/](https://luxeecommercesite-production.up.railway.app/)**
 
-![Luxe E-commerce](https://luxe-ecommerce.netlify.app/screenshot.png)
-
 ## ✨ Features
 
 - **User Authentication** - Register, login, and password recovery
@@ -153,5 +151,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For questions or feedback, please contact:
 
-- Email: your.email@example.com
-- GitHub: [Your GitHub Profile](https://github.com/yourusername)
+- Email: pkalp61@gmail.com
+- GitHub: [My GitHub Profile](https://github.com/kalp9197)
