@@ -5,7 +5,7 @@
   "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "start": "node src/server.js",
+    "start": "npx prisma generate && node src/server.js",
     "dev": "nodemon src/server.js",
     "lint": "eslint src/**/*.js",
     "format": "prettier --write src/**/*.js",
@@ -34,4 +34,4 @@
     "prettier": "^3.2.5",
     "prisma": "^5.10.2"
   }
-} 
+}

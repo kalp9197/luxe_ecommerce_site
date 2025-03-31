@@ -17,11 +17,14 @@ const api = axios.create({
 // Request interceptor for adding the auth token
 api.interceptors.request.use(
   (config) => {
-    console.log("API Request:", {
-      url: config.url,
-      method: config.method,
-      data: config.data,
-    });
+    // Don't log in production
+    if (import.meta.env.DEV) {
+      console.log("API Request:", {
+        url: config.url,
+        method: config.method,
+        data: config.data,
+      });
+    }
 
     const token = localStorage.getItem("token");
     if (token) {
@@ -38,13 +41,27 @@ api.interceptors.request.use(
 // Response interceptor for handling errors
 api.interceptors.response.use(
   (response) => {
-    console.log("API Response:", {
-      status: response.status,
-      data: response.data,
-    });
+    // Don't log in production
+    if (import.meta.env.DEV) {
+      console.log("API Response:", {
+        status: response.status,
+        data: response.data,
+      });
+    }
     return response;
   },
   (error) => {
+    // Handle network errors more gracefully
+    if (!error.response) {
+      console.error(
+        "Network Error: Could not connect to the API server. Please check your connection or the server might be down."
+      );
+      return Promise.reject({
+        message: "Could not connect to the server. Please try again later.",
+        original: error,
+      });
+    }
+
     console.error(
       "API Response Error:",
       error.response
@@ -61,6 +78,8 @@ api.interceptors.response.use(
       // Logout user
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      localStorage.removeItem("luxe_auth_data");
+      localStorage.removeItem("luxe_last_active");
       window.location.href = "/login";
     }
 
