@@ -154,4 +154,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For questions or feedback, please contact:
 
 - Email: pkalp61@gmail.com
-- GitHub: [Github Profile](https://github.com/kalp9197)
+- GitHub: [GitHub Profile](https://github.com/kalp9197)
