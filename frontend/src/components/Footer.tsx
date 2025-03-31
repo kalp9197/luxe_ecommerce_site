@@ -9,12 +9,7 @@ const Footer = () => {
   const footerLinks = {
     shop: ["All Products", "New Arrivals", "Best Sellers", "Sale"],
     about: ["About Us", "Contact"],
-    support: [
-      "FAQ",
-      "Shipping & Returns",
-      "Privacy Policy",
-      "Terms of Service",
-    ],
+    support: [],
   };
 
   // Helper function to get correct links
@@ -143,20 +138,6 @@ const Footer = () => {
           <p className="text-sm text-muted-foreground">
             © {currentYear} LUXE. All rights reserved.
           </p>
-          <div className="mt-4 md:mt-0">
-            <ul className="flex space-x-6">
-              {footerLinks.support.map((link) => (
-                <li key={link}>
-                  <Link
-                    to="/"
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {link}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
       </div>
     </footer>

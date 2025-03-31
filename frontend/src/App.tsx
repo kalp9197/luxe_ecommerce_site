@@ -24,6 +24,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/ForgotPassword";
+import Wishlist from "./pages/Wishlist";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { useEffect, useState } from "react";
 
@@ -90,7 +91,7 @@ const AppContent = () => {
 
   return (
     <AuthProvider>
-      <ThemeProvider defaultTheme="light">
+      <ThemeProvider defaultTheme="dark">
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>
             <Toaster />
@@ -146,6 +147,14 @@ const AppContent = () => {
                   element={
                     <ProtectedRoute>
                       <Sale />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/wishlist"
+                  element={
+                    <ProtectedRoute>
+                      <Wishlist />
                     </ProtectedRoute>
                   }
                 />
