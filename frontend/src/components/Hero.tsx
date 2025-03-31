@@ -61,7 +61,7 @@ const Hero = () => {
             </Button>
             <Button
               size="lg"
-              className="bg-white/10 hover:bg-white/20 border border-white/20 text-white"
+              className="bg-white/30 hover:bg-white/40 border-2 border-white text-white font-semibold shadow-md backdrop-blur-sm"
               asChild
             >
               <Link to="/categories">Explore Collection</Link>

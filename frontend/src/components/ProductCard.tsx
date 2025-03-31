@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Heart, ShoppingCart, Star } from "lucide-react";
@@ -21,6 +21,21 @@ interface CartItem {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const { toast } = useToast();
+  const [isInWishlist, setIsInWishlist] = useState(false);
+
+  // Check if product is in wishlist
+  useEffect(() => {
+    try {
+      const savedWishlist = localStorage.getItem("wishlist");
+      if (savedWishlist) {
+        const wishlistItems = JSON.parse(savedWishlist);
+        const exists = wishlistItems.some((item) => item.id === product.id);
+        setIsInWishlist(exists);
+      }
+    } catch (error) {
+      console.error("Error checking wishlist:", error);
+    }
+  }, [product.id]);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -56,6 +71,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
       // Save updated cart to localStorage
       localStorage.setItem("cart", JSON.stringify(cartItems));
 
+      // Dispatch event to notify cart component of update
+      window.dispatchEvent(new Event("cartUpdated"));
+
       toast({
         title: "Added to cart",
         description: `${product.title} has been added to your cart.`,
@@ -73,10 +91,53 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const handleAddToWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    toast({
-      title: "Added to wishlist",
-      description: `${product.title} has been added to your wishlist.`,
-    });
+
+    try {
+      // Get current wishlist from localStorage
+      const existingWishlist = localStorage.getItem("wishlist");
+      let wishlistItems = existingWishlist ? JSON.parse(existingWishlist) : [];
+
+      // Check if product already exists in wishlist
+      const existingItemIndex = wishlistItems.findIndex(
+        (item) => item.id === product.id
+      );
+
+      if (existingItemIndex >= 0) {
+        // Remove from wishlist if already there
+        wishlistItems = wishlistItems.filter((item) => item.id !== product.id);
+        setIsInWishlist(false);
+        toast({
+          title: "Removed from wishlist",
+          description: `${product.title} has been removed from your wishlist.`,
+        });
+      } else {
+        // Add new item to wishlist
+        wishlistItems.push({
+          id: product.id,
+          name: product.title,
+          price: product.price,
+          image: product.image,
+        });
+        setIsInWishlist(true);
+        toast({
+          title: "Added to wishlist",
+          description: `${product.title} has been added to your wishlist.`,
+        });
+      }
+
+      // Save updated wishlist to localStorage
+      localStorage.setItem("wishlist", JSON.stringify(wishlistItems));
+
+      // Dispatch event to notify components of wishlist update
+      window.dispatchEvent(new Event("wishlistUpdated"));
+    } catch (error) {
+      console.error("Error updating wishlist:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update wishlist. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const item = {
@@ -93,19 +154,27 @@ const ProductCard = ({ product }: ProductCardProps) => {
       variants={item}
     >
       <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-muted/20">
-        <img
-          src={product.image}
-          alt={product.title}
-          className="h-60 w-full object-contain p-4 object-center group-hover:scale-105 transition-transform duration-500"
-        />
-        <div className="absolute top-3 right-3 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <Link to={`/product/${product.id}`}>
+          <img
+            src={product.image}
+            alt={product.title}
+            className="h-60 w-full object-contain p-4 object-center group-hover:scale-105 transition-transform duration-500"
+          />
+        </Link>
+        <div className="absolute top-3 right-3 space-y-2">
           <Button
             size="icon"
-            variant="secondary"
-            className="h-8 w-8 rounded-full bg-white shadow-md hover:bg-primary hover:text-white dark:bg-gray-800 dark:hover:bg-primary"
+            variant={isInWishlist ? "default" : "secondary"}
+            className={`h-8 w-8 rounded-full shadow-md dark:hover:bg-primary ${
+              isInWishlist
+                ? "bg-red-500 hover:bg-red-600 text-white"
+                : "bg-white hover:bg-primary hover:text-white dark:bg-gray-800"
+            }`}
             onClick={handleAddToWishlist}
           >
-            <Heart className="h-4 w-4" />
+            <Heart
+              className={`h-4 w-4 ${isInWishlist ? "fill-white" : "stroke-[2px] text-gray-700"}`}
+            />
           </Button>
         </div>
       </div>

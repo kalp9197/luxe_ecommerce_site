@@ -8,6 +8,7 @@ import {
   Sun,
   Moon,
   LogOut,
+  Heart,
 } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,8 @@ import { motion, AnimatePresence } from "framer-motion";
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [wishlistCount, setWishlistCount] = useState(0);
+  const [isInHeroSection, setIsInHeroSection] = useState(true);
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
@@ -82,11 +85,62 @@ const Header = () => {
     };
   }, []);
 
+  // Update wishlist count from localStorage
+  useEffect(() => {
+    const updateWishlistCount = () => {
+      try {
+        const wishlist = localStorage.getItem("wishlist");
+        if (wishlist) {
+          const wishlistItems = JSON.parse(wishlist);
+          setWishlistCount(wishlistItems.length);
+        } else {
+          setWishlistCount(0);
+        }
+      } catch (error) {
+        console.error("Error updating wishlist count:", error);
+        setWishlistCount(0);
+      }
+    };
+
+    // Initial count
+    updateWishlistCount();
+
+    // Listen for storage events to update count when wishlist changes
+    const handleStorageChange = (e) => {
+      if (e.key === "wishlist") {
+        updateWishlistCount();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("wishlistUpdated", updateWishlistCount);
+
+    // Check wishlist periodically
+    const interval = setInterval(updateWishlistCount, 2000);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("wishlistUpdated", updateWishlistCount);
+      clearInterval(interval);
+    };
+  }, []);
+
   useEffect(() => {
     const handleScroll = () => {
+      // Check if scrolled past hero threshold
       const isScrolled = window.scrollY > 10;
+
+      // Check if we're in the hero section (first part of page)
+      // A typical hero section might be around 100vh, so around 600-800px
+      const heroSectionThreshold = 600;
+      const inHeroSection = window.scrollY < heroSectionThreshold;
+
       if (isScrolled !== scrolled) {
         setScrolled(isScrolled);
+      }
+
+      if (isInHeroSection !== inHeroSection) {
+        setIsInHeroSection(inHeroSection);
       }
     };
 
@@ -94,7 +148,7 @@ const Header = () => {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [scrolled]);
+  }, [scrolled, isInHeroSection]);
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
@@ -103,8 +157,24 @@ const Header = () => {
   // Determine if we're on the sale page
   const isSalePage = location.pathname === "/sale";
 
-  // Determine text color based on scroll and theme
-  const textColor = !scrolled ? "text-white" : "text-foreground";
+  // Determine if we're on the home page
+  const isHomePage = location.pathname === "/";
+
+  // Determine text color based on theme, current page, and scroll position
+  // Home page in hero section: always white text regardless of theme
+  // Home page outside hero section in light mode: black text
+  // Other pages: white text in dark mode, black text in light mode
+  const textColor = isHomePage
+    ? isInHeroSection
+      ? "text-white"
+      : theme === "dark"
+        ? "text-white"
+        : "text-gray-900"
+    : theme === "dark"
+      ? !scrolled
+        ? "text-white"
+        : "text-foreground"
+      : "text-gray-900";
 
   return (
     <header
@@ -144,20 +214,21 @@ const Header = () => {
                   {item}
                 </Link>
               ))}
-              {!isSalePage && (
-                <Link
-                  to="/sale"
-                  className="text-sm font-medium px-3 py-1 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
-                >
-                  SALE
-                </Link>
-              )}
             </>
           )}
         </nav>
 
         {/* Icons */}
         <div className="flex items-center space-x-4">
+          {!isSalePage && isAuthenticated && (
+            <Link
+              to="/sale"
+              className="text-sm font-medium px-3 py-1 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors flex items-center justify-center mr-2"
+            >
+              SALE
+            </Link>
+          )}
+
           <Sheet>
             <SheetTrigger asChild>
               <Button
@@ -237,6 +308,15 @@ const Header = () => {
                         Edit Profile
                       </Button>
                     </Link>
+                    <Link to="/wishlist" className="block w-full">
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start mb-2"
+                      >
+                        <Heart className="mr-2 h-4 w-4" />
+                        My Wishlist
+                      </Button>
+                    </Link>
                     <Button
                       variant="outline"
                       className="w-full justify-start"
@@ -249,12 +329,39 @@ const Header = () => {
                 </SheetContent>
               </Sheet>
 
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn("relative hover:text-primary group", textColor)}
+                onClick={() => navigate("/wishlist")}
+              >
+                <Heart className="h-5 w-5 stroke-[2px]" />
+                <AnimatePresence>
+                  {wishlistCount > 0 && (
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                    >
+                      {wishlistCount}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+                <span className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-background border border-border p-1 rounded text-xs w-max opacity-0 group-hover:opacity-100 transition-opacity">
+                  Wishlist
+                </span>
+              </Button>
+
               <Sheet>
                 <SheetTrigger asChild>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className={cn("relative hover:text-primary", textColor)}
+                    className={cn(
+                      "relative hover:text-primary group",
+                      textColor
+                    )}
                   >
                     <ShoppingCart className="h-5 w-5" />
                     <AnimatePresence>
@@ -269,6 +376,9 @@ const Header = () => {
                         </motion.span>
                       )}
                     </AnimatePresence>
+                    <span className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-background border border-border p-1 rounded text-xs w-max opacity-0 group-hover:opacity-100 transition-opacity">
+                      Cart
+                    </span>
                   </Button>
                 </SheetTrigger>
                 <SheetContent className="overflow-y-auto">
