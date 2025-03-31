@@ -1,5 +1,5 @@
 [build]
-  command = "npm install && npm run build"
+  command = "npm run build:netlify"
   publish = "dist"
 
 # Handle SPA routing
@@ -8,12 +8,9 @@
   to = "/index.html"
   status = 200
 
-# Environment variable definitions based on context
-[context.production.environment]
-  NODE_ENV = "production"
-
-[context.deploy-preview.environment]
-  NODE_ENV = "production"
+# Environment variables for Netlify functions
+[build.environment]
+  NODE_VERSION = "18"
 
 # Performance optimization
 [[headers]]
