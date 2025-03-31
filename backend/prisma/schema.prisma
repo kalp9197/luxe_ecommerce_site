@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String    @unique
+  password  String
+  role      Role      @default(USER)
+  phone     String?
+  address   String?
+  avatar    String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  orders    Order[]
+  reviews   Review[]
+  wishlist  Product[] @relation(fields: [wishlistIds], references: [id])
+  wishlistIds String[] @db.ObjectId
+  cart      CartItem[]
+}
+
+model Product {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String
+  price       Float
+  salePrice   Float?
+  images      String[]
+  brand       String?
+  category    Category   @relation(fields: [categoryId], references: [id])
+  categoryId  String     @db.ObjectId
+  inventory   Int        @default(0)
+  rating      Float      @default(0)
+  numReviews  Int        @default(0)
+  featured    Boolean    @default(false)
+  newArrival  Boolean    @default(false)
+  bestSeller  Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  reviews     Review[]
+  wishedBy    User[]     @relation(fields: [wishedByIds], references: [id])
+  wishedByIds String[]   @db.ObjectId
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+}
+
+model Category {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String    @unique
+  description String?
+  image       String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Review {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  rating    Int
+  comment   String?
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @db.ObjectId
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String   @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CartItem {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  quantity  Int
+  product   Product @relation(fields: [productId], references: [id])
+  productId String  @db.ObjectId
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String  @db.ObjectId
+}
+
+model Order {
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  user            User        @relation(fields: [userId], references: [id])
+  userId          String      @db.ObjectId
+  items           OrderItem[]
+  totalAmount     Float
+  shippingAddress String
+  paymentMethod   String
+  paymentResult   PaymentResult?
+  status          OrderStatus @default(PENDING)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id])
+  productId String  @db.ObjectId
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String  @db.ObjectId
+  quantity  Int
+  price     Float
+}
+
+model PaymentResult {
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  order         Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId       String @unique @db.ObjectId
+  paymentId     String
+  status        String
+  emailAddress  String?
+  updateTime    String
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+} 

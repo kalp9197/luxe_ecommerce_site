@@ -1,69 +1,155 @@
-# Welcome to your Lovable project
+# Luxe E-commerce Platform
 
-## Project info
+A full-featured e-commerce platform with a beautiful UI and smooth animations built with the MERN stack (MongoDB, Express, React, Node.js) and Prisma ORM.
 
-**URL**: https://lovable.dev/projects/09cde469-a90a-424e-a370-ecad06af15ad
+## Features
 
-## How can I edit this code?
+- **User Authentication**: Sign up, login, and profile management with JWT
+- **Product Management**: Browse, search, filter, and sort products
+- **Shopping Cart**: Add, update, remove items
+- **Checkout Process**: Integrated with Stripe
+- **Order Management**: Track orders and order history
+- **Admin Dashboard**: Manage products, categories, orders, and users
+- **Responsive Design**: Works on all devices
+- **Animations**: Smooth transitions and interactive elements
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+### Frontend
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/09cde469-a90a-424e-a370-ecad06af15ad) and start prompting.
+- React (with TypeScript)
+- Tailwind CSS
+- Framer Motion (for animations)
+- React Query
+- Context API
 
-Changes made via Lovable will be committed automatically to this repo.
+### Backend
 
-**Use your preferred IDE**
+- Node.js & Express
+- MongoDB
+- Prisma ORM
+- JSON Web Tokens (JWT)
+- Stripe (payment processing)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Project Structure
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+luxe_ecommerce_site/
+├── frontend/               # React frontend
+│   ├── public/             # Static files
+│   ├── src/                # React source code
+│   │   ├── components/     # Reusable components
+│   │   ├── contexts/       # React context providers
+│   │   ├── hooks/          # Custom hooks
+│   │   ├── lib/            # Utilities
+│   │   ├── pages/          # Page components
+│   │   └── services/       # API service functions
+│   └── ...
+├── backend/                # Node.js backend
+│   ├── prisma/             # Prisma schema & migrations
+│   ├── src/                # Express source code
+│   │   ├── controllers/    # Request handlers
+│   │   ├── middleware/     # Express middleware
+│   │   ├── routes/         # API routes
+│   │   ├── utils/          # Utility functions
+│   │   └── server.js       # Express app
+│   └── ...
+├── package.json            # Root package.json for project
+└── ...
 ```
 
-**Edit a file directly in GitHub**
+## Getting Started
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Prerequisites
 
-**Use GitHub Codespaces**
+- Node.js (v18 or newer)
+- MongoDB account (local or Atlas)
+- npm or yarn
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Installation
 
-## What technologies are used for this project?
+1. Clone the repository:
 
-This project is built with .
+   ```bash
+   git clone https://github.com/kalp9197/luxe_ecommerce_site.git
+   cd luxe_ecommerce_site
+   ```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+2. Install dependencies:
 
-## How can I deploy this project?
+   ```bash
+   npm install
+   ```
 
-Simply open [Lovable](https://lovable.dev/projects/09cde469-a90a-424e-a370-ecad06af15ad) and click on Share -> Publish.
+3. Set up environment variables:
 
-## I want to use a custom domain - is that possible?
+   ```bash
+   # Copy example env files
+   cp backend/.env.example backend/.env
+   ```
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+4. Update the `.env` file with your MongoDB connection string and other variables.
+
+5. Generate Prisma client:
+
+   ```bash
+   npm run --workspace=backend prisma:generate
+   ```
+
+6. Seed the database:
+
+   ```bash
+   npm run seed
+   ```
+
+7. Start the development servers:
+
+   ```bash
+   npm run dev
+   ```
+
+8. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Login Credentials
+
+For testing purposes, you can use these credentials:
+
+- **Admin User**:
+
+  - Email: admin@example.com
+  - Password: admin123
+
+- **Regular User**:
+  - Email: john@example.com
+  - Password: user123
+
+## Deployment
+
+### Frontend
+
+The frontend can be deployed to platforms like Vercel, Netlify, or GitHub Pages.
+
+```bash
+npm run build:frontend
+```
+
+### Backend
+
+The backend can be deployed to platforms like Heroku, Render, or AWS.
+
+```bash
+# Start production server
+npm start
+```
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Framer Motion](https://www.framer.com/motion/)
+- [Prisma](https://www.prisma.io/)
+- [MongoDB](https://www.mongodb.com/)
+- [Stripe](https://stripe.com/)
