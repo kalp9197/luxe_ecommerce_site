@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getProducts, convertToINR } from "@/services/api";
 import Header from "@/components/Header";
@@ -14,21 +14,32 @@ const Sale = () => {
     queryKey: ["products"],
     queryFn: getProducts,
   });
+  
+  const confettiCount = useRef(0);
 
-  // Trigger confetti on page load
-  React.useEffect(() => {
+  // Trigger confetti on page load with a limit
+  useEffect(() => {
     const launchConfetti = () => {
       confetti({
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 }
       });
+      confettiCount.current += 1;
     };
     
-    launchConfetti();
-    const interval = setInterval(launchConfetti, 3000);
-    
-    return () => clearInterval(interval);
+    if (confettiCount.current < 3) {
+      launchConfetti();
+      const interval = setInterval(() => {
+        if (confettiCount.current < 3) {
+          launchConfetti();
+        } else {
+          clearInterval(interval);
+        }
+      }, 3000);
+      
+      return () => clearInterval(interval);
+    }
   }, []);
 
   // Filter products and apply discount
@@ -59,8 +70,9 @@ const Sale = () => {
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
       <Header />
       
+      {/* Added mt-24 to push this section down below the navbar */}
       <motion.div 
-        className="bg-gradient-to-r from-red-600 to-pink-600 text-white py-5 text-center"
+        className="bg-gradient-to-r from-red-600 to-pink-600 text-white py-5 text-center mt-24"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -76,7 +88,7 @@ const Sale = () => {
         </div>
       </motion.div>
       
-      <div className="container py-28">
+      <div className="container py-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
