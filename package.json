@@ -21,6 +21,6 @@
     "node": ">=18.0.0"
   },
   "devDependencies": {
-    "concurrently": "^8.2.1"
+    "concurrently": "^8.2.2"
   }
 }
