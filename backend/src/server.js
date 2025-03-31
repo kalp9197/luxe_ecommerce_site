@@ -12,6 +12,7 @@ import orderRoutes from "./routes/orderRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import stripeRoutes from "./routes/stripeRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
 
 // Load environment variables
 dotenv.config();
@@ -97,6 +98,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/stripe", stripeRoutes);
+app.use("/api/payment", paymentRoutes);
 
 // Root route for Railway deployment
 app.get("/", (req, res) => {

@@ -1,92 +1,50 @@
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
 import asyncHandler from "express-async-handler";
+import AppError from "../utils/appError.js";
 
-// Singleton Prisma client with delayed initialization
-let prisma;
-const getPrismaClient = () => {
-  if (!prisma) {
-    try {
-      prisma = new PrismaClient();
-      console.log("Prisma client initialized successfully in authMiddleware");
-    } catch (error) {
-      console.error(
-        "Failed to initialize Prisma client in authMiddleware:",
-        error
-      );
-      // Return null if prisma can't be initialized
-      return null;
-    }
-  }
-  return prisma;
-};
+const prisma = new PrismaClient();
 
 /**
- * Middleware to protect routes by verifying JWT token
+ * Protect routes - Middleware to verify token and set req.user
  */
 export const protect = asyncHandler(async (req, res, next) => {
+  // 1) Get token from header
   let token;
-
-  // Check if token exists in the Authorization header
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")
   ) {
-    try {
-      // Get token from header
-      token = req.headers.authorization.split(" ")[1];
-
-      // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      // Special case for demo user
-      if (decoded.id === "demo-user-id") {
-        req.user = {
-          id: "demo-user-id",
-          name: "Demo User",
-          email: "demo@example.com",
-          role: "USER",
-        };
-        next();
-        return;
-      }
-
-      // Find user and add to request object (excluding password)
-      const client = getPrismaClient();
-      if (client) {
-        req.user = await client.user.findUnique({
-          where: { id: decoded.id },
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            role: true,
-            phone: true,
-            address: true,
-            avatar: true,
-          },
-        });
-      } else {
-        // If Prisma isn't initialized, create a mock user with the ID from the token
-        req.user = {
-          id: decoded.id,
-          name: `User ${decoded.id.substring(0, 5)}`,
-          email: `user-${decoded.id.substring(0, 5)}@example.com`,
-          role: "USER",
-        };
-      }
-
-      next();
-    } catch (error) {
-      console.error(error);
-      res.status(401);
-      throw new Error("Not authorized, token failed");
-    }
+    token = req.headers.authorization.split(" ")[1];
   }
 
+  // 2) Check if token exists
   if (!token) {
-    res.status(401);
-    throw new Error("Not authorized, no token");
+    return next(
+      new AppError("You are not logged in! Please log in to get access", 401)
+    );
+  }
+
+  try {
+    // 3) Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // 4) Check if user still exists
+    const currentUser = await prisma.user.findUnique({
+      where: { id: decoded.id },
+    });
+
+    if (!currentUser) {
+      return next(
+        new AppError("The user belonging to this token no longer exists", 401)
+      );
+    }
+
+    // 5) Set user data to request object
+    req.user = currentUser;
+    next();
+  } catch (error) {
+    return next(new AppError("Invalid token. Please log in again", 401));
   }
 });
 
