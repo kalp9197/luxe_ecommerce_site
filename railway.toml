@@ -1,9 +1,9 @@
 [build]
 builder = "nixpacks"
-buildCommand = "cd backend && npm install"
+buildCommand = "cd backend && npm install && npx prisma generate"
 
 [deploy]
-startCommand = "cd backend && npm start"
+startCommand = "cd backend && npx prisma generate && npm start"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
 
@@ -11,10 +11,10 @@ restartPolicyMaxRetries = 3
 cmds = ["cd backend"]
 
 [phases.build]
-cmds = ["cd backend", "npm install"]
+cmds = ["cd backend", "npm install", "npx prisma generate"]
 
 [phases.start]
-cmds = ["cd backend", "npm start"]
+cmds = ["cd backend", "npx prisma generate", "npm start"]
 
 # Specify engines
 [nixpacks]

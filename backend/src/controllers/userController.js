@@ -3,13 +3,21 @@ import asyncHandler from "express-async-handler";
 import bcrypt from "bcryptjs";
 import generateToken from "../utils/generateToken.js";
 
-// Singleton Prisma client
+// Singleton Prisma client with delayed initialization
 let prisma;
-try {
-  prisma = new PrismaClient();
-} catch (error) {
-  console.error("Failed to initialize Prisma client:", error);
-}
+const getPrismaClient = () => {
+  if (!prisma) {
+    try {
+      prisma = new PrismaClient();
+      console.log("Prisma client initialized successfully");
+    } catch (error) {
+      console.error("Failed to initialize Prisma client:", error);
+      // Return null if prisma can't be initialized
+      return null;
+    }
+  }
+  return prisma;
+};
 
 /**
  * @desc    Authenticate user & get token
