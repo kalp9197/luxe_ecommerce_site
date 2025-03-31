@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
-import { ShoppingCart, Menu, X, Search, User } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ShoppingCart, Menu, X, Search, User, Sun, Moon } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -14,10 +14,14 @@ import {
 import { cn } from "@/lib/utils";
 import Cart from "@/components/Cart";
 import MobileNav from "@/components/MobileNav";
+import { useTheme } from "@/components/ThemeProvider";
+import SearchBar from "@/components/SearchBar";
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [cartCount, setCartCount] = useState(3); // Mock cart count
+  const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,12 +37,16 @@ const Header = () => {
     };
   }, [scrolled]);
 
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
+
   return (
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300 animate-fade-in",
         scrolled
-          ? "bg-white/90 backdrop-blur-md shadow-sm py-3"
+          ? "bg-background/90 backdrop-blur-md shadow-sm py-3"
           : "bg-transparent py-5"
       )}
     >
@@ -53,7 +61,7 @@ const Header = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-8">
-          {["Home", "Shop", "Categories", "Sale", "About"].map((item) => (
+          {["Home", "Shop", "Categories", "About"].map((item) => (
             <Link
               key={item}
               to={item === "Home" ? "/" : `/${item.toLowerCase()}`}
@@ -62,12 +70,29 @@ const Header = () => {
               {item}
             </Link>
           ))}
+          <Link
+            to="/sale"
+            className="text-sm font-medium transition-all hover:text-primary relative px-3 py-1 bg-red-600 text-white rounded-full"
+          >
+            SALE
+          </Link>
         </nav>
 
         {/* Icons */}
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon" className="hover:text-primary">
-            <Search className="h-5 w-5" />
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="hover:text-primary relative">
+                <Search className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="top" className="w-full">
+              <SearchBar />
+            </SheetContent>
+          </Sheet>
+          
+          <Button variant="ghost" size="icon" className="hover:text-primary" onClick={toggleTheme}>
+            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
           
           <Button variant="ghost" size="icon" className="hover:text-primary">
@@ -80,7 +105,7 @@ const Header = () => {
               <Button variant="ghost" size="icon" className="relative hover:text-primary">
                 <ShoppingCart className="h-5 w-5" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-scale-in">
+                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center animate-scale-in">
                     {cartCount}
                   </span>
                 )}

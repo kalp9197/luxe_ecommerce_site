@@ -37,12 +37,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
     show: { opacity: 1, y: 0, transition: { duration: 0.5 } }
   };
 
+  // Show original price if it exists (for sale items)
+  const hasDiscount = product.originalPrice !== undefined;
+
   return (
     <motion.div 
-      className="group relative rounded-lg overflow-hidden product-card-shadow bg-white"
+      className="group relative rounded-lg overflow-hidden product-card-shadow bg-card"
       variants={item}
     >
-      <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-100">
+      <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-muted/20">
         <img
           src={product.image}
           alt={product.title}
@@ -52,7 +55,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           <Button
             size="icon"
             variant="secondary"
-            className="h-8 w-8 rounded-full bg-white shadow-md hover:bg-primary hover:text-white"
+            className="h-8 w-8 rounded-full bg-white shadow-md hover:bg-primary hover:text-white dark:bg-gray-800 dark:hover:bg-primary"
             onClick={handleAddToWishlist}
           >
             <Heart className="h-4 w-4" />
@@ -79,19 +82,26 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 className={`h-4 w-4 ${
                   i < Math.round(product.rating.rate)
                     ? "text-yellow-400 fill-yellow-400"
-                    : "text-gray-300"
+                    : "text-gray-300 dark:text-gray-600"
                 }`}
               />
             ))}
           </div>
-          <span className="text-xs text-gray-500 ml-1">({product.rating.count})</span>
+          <span className="text-xs text-muted-foreground ml-1">({product.rating.count})</span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="font-bold">${product.price.toFixed(2)}</span>
+          <div>
+            <span className="font-bold text-foreground">₹{product.price.toFixed(0)}</span>
+            {hasDiscount && (
+              <span className="text-sm line-through text-muted-foreground ml-2">
+                ₹{product.originalPrice?.toFixed(0)}
+              </span>
+            )}
+          </div>
           <Button
             size="sm"
             variant="ghost"
-            className="text-primary hover:bg-primary hover:text-white"
+            className="text-primary hover:bg-primary hover:text-primary-foreground"
             onClick={handleAddToCart}
           >
             <ShoppingCart className="h-4 w-4 mr-2" />

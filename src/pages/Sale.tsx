@@ -1,12 +1,13 @@
 
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getProducts } from "@/services/api";
+import { getProducts, convertToINR } from "@/services/api";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { Loader2 } from "lucide-react";
+import { Loader2, Percent } from "lucide-react";
 import { motion } from "framer-motion";
+import confetti from "canvas-confetti";
 
 const Sale = () => {
   const { data: allProducts, isLoading, error } = useQuery({
@@ -14,17 +15,33 @@ const Sale = () => {
     queryFn: getProducts,
   });
 
+  // Trigger confetti on page load
+  React.useEffect(() => {
+    const launchConfetti = () => {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    };
+    
+    launchConfetti();
+    const interval = setInterval(launchConfetti, 3000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   // Filter products and apply discount
   const saleProducts = React.useMemo(() => {
     if (!allProducts) return [];
     
-    // Randomly select ~30% of products to be on sale
+    // Randomly select ~50% of products to be on sale
     return allProducts
-      .filter((_, index) => index % 3 === 0)
+      .filter((_, index) => index % 2 === 0)
       .map(product => ({
         ...product,
         originalPrice: product.price,
-        price: parseFloat((product.price * 0.7).toFixed(2)) // 30% discount
+        price: Math.round(product.price * 0.7) // 30% discount
       }));
   }, [allProducts]);
 
@@ -39,23 +56,40 @@ const Sale = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
       <Header />
       
       <motion.div 
-        className="bg-red-600 text-white py-3 text-center"
+        className="bg-gradient-to-r from-red-600 to-pink-600 text-white py-5 text-center"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <p className="text-lg font-bold">LIMITED TIME OFFER: 30% OFF SELECTED ITEMS!</p>
+        <div className="container">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-3">
+            <Percent className="h-8 w-8 animate-pulse" />
+            <div>
+              <h2 className="text-2xl font-bold">MEGA SALE EVENT</h2>
+              <p className="text-white/80">30% OFF SELECTED ITEMS - LIMITED TIME ONLY!</p>
+            </div>
+          </div>
+        </div>
       </motion.div>
       
       <div className="container py-28">
-        <h1 className="text-4xl font-bold mb-4 text-center">Sale Items</h1>
-        <p className="text-center text-muted-foreground mb-10 max-w-xl mx-auto">
-          Browse our special selection of discounted products. Limited stock available, so shop now while supplies last!
-        </p>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.7 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-red-600 to-pink-600 text-transparent bg-clip-text">
+            SALE
+          </h1>
+          <p className="text-muted-foreground max-w-xl mx-auto">
+            Browse our special selection of discounted products. Limited stock available, so shop now while supplies last!
+          </p>
+        </motion.div>
         
         {isLoading && (
           <div className="flex justify-center items-center h-64">
@@ -77,12 +111,17 @@ const Sale = () => {
             animate="show"
           >
             {saleProducts.map((product) => (
-              <div key={product.id} className="relative">
-                <div className="absolute top-0 left-0 bg-red-600 text-white px-4 py-1 z-10 rounded-tl-lg rounded-br-lg font-bold">
-                  SALE
+              <motion.div 
+                key={product.id} 
+                className="relative"
+                whileHover={{ scale: 1.03 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <div className="absolute -top-3 -left-3 bg-gradient-to-r from-red-600 to-pink-600 text-white px-4 py-1 z-10 rounded-lg font-bold transform rotate-[-5deg] shadow-lg">
+                  30% OFF
                 </div>
                 <ProductCard product={product} />
-              </div>
+              </motion.div>
             ))}
           </motion.div>
         )}
