@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2, Minus, Plus, ShoppingBag } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Product } from "@/services/api";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // Cart item type
 interface CartItem {
@@ -20,6 +20,7 @@ const Cart = () => {
   const { toast } = useToast();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Load cart items from localStorage
   useEffect(() => {
@@ -42,9 +43,27 @@ const Cart = () => {
   // Save cart to localStorage whenever it changes
   useEffect(() => {
     if (!isLoading) {
-      localStorage.setItem("cart", JSON.stringify(cartItems));
+      updateLocalStorage(cartItems);
     }
   }, [cartItems, isLoading]);
+
+  // Update cart items in localStorage
+  const updateLocalStorage = (items: CartItem[]) => {
+    try {
+      // Ensure consistent format before saving
+      const formattedItems = items.map(item => ({
+        id: Number(item.id),
+        name: item.name,
+        price: Number(item.price),
+        quantity: Number(item.quantity),
+        image: item.image
+      }));
+      
+      localStorage.setItem("cart", JSON.stringify(formattedItems));
+    } catch (error) {
+      console.error("Failed to update cart in localStorage:", error);
+    }
+  };
 
   const calculateTotal = () => {
     return cartItems.reduce(
@@ -167,8 +186,8 @@ const Cart = () => {
               <span>Shipping</span>
               <span>Calculated at checkout</span>
             </div>
-            <Button className="w-full" onClick={handleCheckout}>
-              Checkout
+            <Button className="w-full" onClick={() => navigate("/checkout")}>
+              Proceed to Checkout
             </Button>
           </div>
         </>

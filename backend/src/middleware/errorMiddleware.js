@@ -1,5 +1,5 @@
 /**
- * Handle 404 errors for routes that don't exist
+ * Middleware for handling 404 (Not Found) errors
  */
 export const notFound = (req, res, next) => {
   const error = new Error(`Not Found - ${req.originalUrl}`);
@@ -8,25 +8,18 @@ export const notFound = (req, res, next) => {
 };
 
 /**
- * Global error handler
+ * Global error handler middleware
  */
 export const errorHandler = (err, req, res, next) => {
-  console.error("ERROR 💥:", {
-    message: err.message,
-    name: err.name,
-    stack: err.stack,
-    path: req.path,
-    method: req.method,
-    body: req.body,
-  });
-
-  // Sometimes status code might be 200 even when there's an error
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
 
-  res.status(statusCode);
-  res.json({
+  // Log error in development
+  if (process.env.NODE_ENV === "development") {
+    console.error(err.stack);
+  }
+
+  res.status(statusCode).json({
     message: err.message,
-    stack: process.env.NODE_ENV === "production" ? "🥞" : err.stack,
-    name: err.name,
+    stack: process.env.NODE_ENV === "production" ? null : err.stack,
   });
 };
