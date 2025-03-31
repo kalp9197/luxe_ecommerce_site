@@ -39,6 +39,7 @@ const allowedOrigins = [
   "http://localhost:8080",
   "http://localhost:8081",
   process.env.FRONTEND_URL,
+  "https://luxe-ecommerce.netlify.app", // Explicitly add the Netlify domain
 ];
 
 // If FRONTEND_URL contains a domain with 'netlify.app', also allow all subdomains
@@ -58,6 +59,9 @@ app.use(
       // Allow requests with no origin (like mobile apps, curl, etc)
       if (!origin) return callback(null, true);
 
+      // For debugging
+      console.log("Request origin:", origin);
+
       // Check if origin matches any allowed origin or netlify pattern
       const isAllowed = allowedOrigins.some((allowedOrigin) => {
         if (allowedOrigin === origin) return true;
@@ -74,12 +78,14 @@ app.use(
       if (isAllowed) {
         callback(null, true);
       } else {
+        console.error(`CORS not allowed for origin: ${origin}`);
         callback(new Error(`CORS not allowed for origin: ${origin}`));
       }
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["Access-Control-Allow-Origin"],
   })
 );
 
