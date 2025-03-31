@@ -142,6 +142,109 @@ The backend can be deployed to platforms like Heroku, Render, or AWS.
 npm start
 ```
 
+## Deployment Guide
+
+This guide will help you deploy the Luxe E-commerce application to Netlify (frontend) and Railway (backend).
+
+### Backend Deployment to Railway
+
+1. Sign up for a [Railway](https://railway.app/) account if you don't have one
+
+2. Install the Railway CLI (optional)
+
+   ```
+   npm i -g @railway/cli
+   ```
+
+3. Configure environment variables on Railway:
+   - DATABASE_URL - Your MongoDB connection string
+   - JWT_SECRET - Secret for JWT token generation
+   - NODE_ENV - Set to "production"
+   - FRONTEND_URL - Your Netlify app URL (e.g., https://your-app.netlify.app)
+4. Deploy using GitHub integration:
+
+   - Connect your GitHub repository to Railway
+   - Select the backend folder (if using monorepo)
+   - Configure the build settings:
+     - Build command: `npm install`
+     - Start command: `npm start`
+
+5. After deployment, note your Railway application URL (e.g., https://your-app.railway.app)
+
+### Frontend Deployment to Netlify
+
+1. Sign up for a [Netlify](https://www.netlify.com/) account if you don't have one
+
+2. Prepare your frontend environment variables:
+
+   - Create a `.env.production` file in your frontend directory with:
+     ```
+     VITE_API_URL=https://your-app.railway.app/api
+     ```
+
+3. Deploy using Netlify UI:
+
+   - Log in to Netlify
+   - Click "New site from Git"
+   - Select your repository
+   - Configure build settings:
+     - Base directory: `frontend` (if using monorepo)
+     - Build command: `npm run build`
+     - Publish directory: `dist`
+   - Add environment variables:
+     - VITE_API_URL: https://your-app.railway.app/api
+
+4. Deploy site
+
+   - Netlify will build and deploy your site
+   - Your site will be available at a Netlify subdomain
+
+5. Configure custom domain (optional):
+   - Go to Site settings > Domain management
+   - Add custom domain
+
+### Post-Deployment Configuration
+
+1. Update CORS settings:
+
+   - In Railway, ensure FRONTEND_URL is set to your Netlify URL
+
+2. Test the connection:
+
+   - Open your Netlify site
+   - Try to login/register to ensure connection to backend
+
+3. Monitor for errors:
+   - Check Railway logs
+   - Check Netlify deploy logs
+   - Monitor browser console for CORS or API errors
+
+## Local Development
+
+1. Clone the repository
+
+   ```
+   git clone <repository-url>
+   ```
+
+2. Install dependencies
+
+   ```
+   npm install
+   ```
+
+3. Set up environment variables
+
+   - Create `.env` files in both frontend and backend directories
+
+4. Start development servers
+
+   ```
+   npm run dev
+   ```
+
+5. Open http://localhost:8080 in your browser
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.

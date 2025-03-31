@@ -1,0 +1,28 @@
+[build]
+builder = "nixpacks"
+buildCommand = "cd backend && npm install"
+
+[deploy]
+startCommand = "cd backend && npm start"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+[phases.setup]
+cmds = ["cd backend"]
+
+[phases.build]
+cmds = ["cd backend", "npm install"]
+
+[phases.start]
+cmds = ["cd backend", "npm start"]
+
+# Specify engines
+[nixpacks]
+node-version = "18"
+
+[[services]]
+internal_port = 5003
+protocol = "http"
+
+[envs]
+NODE_ENV = "production" 

@@ -25,6 +25,16 @@ import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/ForgotPassword";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { useEffect, useState } from "react";
+
+// Log the environment and API URL in development
+if (import.meta.env.DEV) {
+  console.log("Environment:", import.meta.env.MODE);
+  console.log(
+    "API URL:",
+    import.meta.env.VITE_API_URL || "http://localhost:5003/api"
+  );
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,146 +67,110 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-// Create router with future flags to remove warnings
-const router = createBrowserRouter(
-  [
-    {
-      path: "/",
-      element: <Index />,
-    },
-    {
-      path: "/shop",
-      element: <Shop />,
-    },
-    {
-      path: "/categories",
-      element: <CategoriesPage />,
-    },
-    {
-      path: "/category/:category",
-      element: <CategoryProducts />,
-    },
-    {
-      path: "/product/:id",
-      element: <ProductDetail />,
-    },
-    {
-      path: "/about",
-      element: <About />,
-    },
-    {
-      path: "/sale",
-      element: <Sale />,
-    },
-    {
-      path: "/login",
-      element: <Login />,
-    },
-    {
-      path: "/register",
-      element: <Register />,
-    },
-    {
-      path: "/profile",
-      element: <Profile />,
-    },
-    {
-      path: "/forgot-password",
-      element: <ForgotPassword />,
-    },
-    {
-      path: "*",
-      element: <NotFound />,
-    },
-  ],
-  {
-    future: {
-      v7_startTransition: true,
-      v7_relativeSplatPath: true,
-    },
-  }
-);
+// App wrapper to handle initial loading state
+const AppContent = () => {
+  const [isLoading, setIsLoading] = useState(true);
 
-const App = () => (
-  <AuthProvider>
-    <ThemeProvider defaultTheme="light">
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter
-            future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-          >
-            <ScrollToTop />
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <Index />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/shop"
-                element={
-                  <ProtectedRoute>
-                    <Shop />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/categories"
-                element={
-                  <ProtectedRoute>
-                    <CategoriesPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/category/:category"
-                element={
-                  <ProtectedRoute>
-                    <CategoryProducts />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/product/:id"
-                element={
-                  <ProtectedRoute>
-                    <ProductDetail />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/about" element={<About />} />
-              <Route
-                path="/sale"
-                element={
-                  <ProtectedRoute>
-                    <Sale />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute>
-                    <Profile />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
-  </AuthProvider>
-);
+  useEffect(() => {
+    // Simulate checking environment and config
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  return (
+    <AuthProvider>
+      <ThemeProvider defaultTheme="light">
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter
+              future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+            >
+              <ScrollToTop />
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <Index />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/shop"
+                  element={
+                    <ProtectedRoute>
+                      <Shop />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/categories"
+                  element={
+                    <ProtectedRoute>
+                      <CategoriesPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/category/:category"
+                  element={
+                    <ProtectedRoute>
+                      <CategoryProducts />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/product/:id"
+                  element={
+                    <ProtectedRoute>
+                      <ProductDetail />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/about" element={<About />} />
+                <Route
+                  path="/sale"
+                  element={
+                    <ProtectedRoute>
+                      <Sale />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </AuthProvider>
+  );
+};
+
+const App = () => <AppContent />;
 
 export default App;
