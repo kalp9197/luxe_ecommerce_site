@@ -202,18 +202,24 @@ const Header = () => {
         <nav className="hidden md:flex space-x-8">
           {isAuthenticated && (
             <>
-              {["Home", "Shop", "Categories", "About"].map((item) => (
-                <Link
-                  key={item}
-                  to={item === "Home" ? "/" : `/${item.toLowerCase()}`}
-                  className={cn(
-                    "text-sm font-medium transition-all hover:text-primary relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform",
-                    textColor
-                  )}
-                >
-                  {item}
-                </Link>
-              ))}
+              {["Home", "Shop", "Categories", "About"].map((item) => {
+                const path = item === "Home" ? "/" : `/${item.toLowerCase()}`;
+                const isActive = location.pathname === path;
+
+                return (
+                  <Link
+                    key={item}
+                    to={path}
+                    className={cn(
+                      "text-sm font-medium transition-all hover:text-primary relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-primary after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform",
+                      textColor,
+                      isActive && "text-purple-600 font-semibold"
+                    )}
+                  >
+                    {item}
+                  </Link>
+                );
+              })}
             </>
           )}
         </nav>
