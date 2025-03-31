@@ -1,7 +1,7 @@
 [build]
   base = "frontend"
-  command = "cd frontend && npm install && npm run build:netlify"
-  publish = "frontend/dist"
+  command = "npm install && npm run build"
+  publish = "dist"
 
 # Handle SPA routing
 [[redirects]]
@@ -9,12 +9,9 @@
   to = "/index.html"
   status = 200
 
-# Environment variable definitions based on context
-[context.production.environment]
-  NODE_ENV = "production"
-
-[context.deploy-preview.environment]
-  NODE_ENV = "production"
+# Environment variables
+[build.environment]
+  NODE_VERSION = "18"
 
 # Performance optimization
 [[headers]]
